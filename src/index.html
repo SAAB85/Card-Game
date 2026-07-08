@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- PANTALLA: MENÚ PRINCIPAL -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-container">
+      <h1 class="game-title">CARD GAME</h1>
+      <p class="game-subtitle">El destino del reino está en tus cartas</p>
+      <nav class="menu-nav">
+        <button class="menu-btn" onclick="showScreen('screen-exploration')">
+          <span class="btn-icon">⚔️</span>
+          <span class="btn-label">Exploración</span>
+          <span class="btn-desc">Mazmorras y jefes</span>
+        </button>
+        <button class="menu-btn" onclick="showScreen('screen-tavern')">
+          <span class="btn-icon">🍺</span>
+          <span class="btn-label">Taberna</span>
+          <span class="btn-desc">Duelos contra IA</span>
+        </button>
+        <button class="menu-btn" onclick="showScreen('screen-shop')">
+          <span class="btn-icon">🏪</span>
+          <span class="btn-label">Tienda</span>
+          <span class="btn-desc">Comprar sobres de cartas</span>
+        </button>
+      </nav>
+      <div class="menu-footer">
+        <span id="player-gold">🪙 0 monedas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA: EXPLORACIÓN (placeholder) -->
+  <div id="screen-exploration" class="screen">
+    <div class="placeholder-container">
+      <h2>⚔️ Exploración</h2>
+      <p>Próximamente — mazmorras y jefes</p>
+      <button class="back-btn" onclick="showScreen('screen-menu')">← Volver al menú</button>
+    </div>
+  </div>
+
+  <!-- PANTALLA: TABERNA (placeholder) -->
+  <div id="screen-tavern" class="screen">
+    <div class="placeholder-container">
+      <h2>🍺 Taberna</h2>
+      <p>Próximamente — duelos contra IA</p>
+      <button class="back-btn" onclick="showScreen('screen-menu')">← Volver al menú</button>
+    </div>
+  </div>
+
+  <!-- PANTALLA: TIENDA (placeholder) -->
+  <div id="screen-shop" class="screen">
+    <div class="placeholder-container">
+      <h2>🏪 Tienda</h2>
+      <p>Próximamente — sobres de cartas</p>
+      <button class="back-btn" onclick="showScreen('screen-menu')">← Volver al menú</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
