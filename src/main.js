@@ -1,20 +1,16 @@
 // ===========================
 // NAVEGACIÓN ENTRE PANTALLAS
+// main.js
 // ===========================
 
 function showScreen(screenId) {
-  // Oculta todas las pantallas
-  document.querySelectorAll('.screen').forEach(screen => {
-    screen.classList.remove('active');
-  });
-  // Muestra la pantalla solicitada
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
 }
 
 // ===========================
 // ESTADO GLOBAL DEL JUGADOR
 // ===========================
-
 const playerData = {
   gold: 0
 };
@@ -24,9 +20,250 @@ function updateGoldDisplay() {
 }
 
 // ===========================
-// INICIALIZACIÓN
+// RENDERIZADO DEL TABLERO
 // ===========================
 
+// Crea el HTML de una carta (para campo o mano)
+function createCardElement(instance, side, inHand = false) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.dataset.instanceId = instance.instanceId;
+
+  // Nombre
+  const name = document.createElement('div');
+  name.className = 'card-name';
+  name.textContent = instance.name;
+  div.appendChild(name);
+
+  // Badge gema (siempre visible en mano, opcional en campo)
+  if (inHand) {
+    const gemBadge = document.createElement('div');
+    gemBadge.className = 'card-badge badge-gem';
+    gemBadge.textContent = instance.cost.gems;
+    div.appendChild(gemBadge);
+
+    // Badge carga mágica
+    if (instance.cost.charges > 0) {
+      const chargeBadge = document.createElement('div');
+      chargeBadge.className = 'card-badge badge-charge';
+      chargeBadge.textContent = instance.cost.charges;
+      div.appendChild(chargeBadge);
+    }
+
+    // Badge sacrificio de vida
+    if (instance.cost.life > 0) {
+      const lifeBadge = document.createElement('div');
+      lifeBadge.className = 'card-badge badge-lifecost';
+      lifeBadge.textContent = instance.cost.life;
+      div.appendChild(lifeBadge);
+    }
+  }
+
+  // Badge ataque (solo criaturas)
+  if (instance.format === 'creature') {
+    // Daño de arma encima del ataque
+    if (instance.equipment) {
+      const weaponBadge = document.createElement('div');
+      weaponBadge.className = 'card-badge badge-weapon';
+      weaponBadge.textContent = '+?';
+      div.appendChild(weaponBadge);
+    }
+    const atkBadge = document.createElement('div');
+    atkBadge.className = 'card-badge badge-attack';
+    atkBadge.textContent = instance.attack;
+    div.appendChild(atkBadge);
+
+    // Armadura encima de vida
+    if (instance.armor > 0) {
+      const armorBadge = document.createElement('div');
+      armorBadge.className = 'card-badge badge-armor';
+      armorBadge.textContent = instance.armor;
+      div.appendChild(armorBadge);
+    }
+
+    // Vida
+    const hpBadge = document.createElement('div');
+    hpBadge.className = 'card-badge badge-hp';
+    hpBadge.textContent = instance.health;
+    div.appendChild(hpBadge);
+  }
+
+  return div;
+}
+
+// Renderiza el campo de batalla completo
+function renderField(side) {
+  const state = getCombatState();
+  if (!state) return;
+
+  const fieldEl = document.getElementById(`${side}-field`);
+  const slots = fieldEl.querySelectorAll('.field-slot');
+  const creatures = side === 'player' ? state.player.field : state.enemy.field;
+
+  slots.forEach((slot, i) => {
+    slot.innerHTML = '';
+    slot.classList.remove('occupied');
+
+    if (creatures[i]) {
+      const cardEl = createCardElement(creatures[i], side, false);
+
+      // Clases de estado
+      if (side === 'player' && creatures[i].canAttackThisTurn) {
+        cardEl.classList.add('can-attack');
+      }
+      if (creatures[i].statusEffects.includes('stunned')) {
+        cardEl.classList.add('stunned');
+      }
+
+      // Click para seleccionar/atacar
+      cardEl.addEventListener('click', () => onFieldCardClick(side, i));
+      slot.appendChild(cardEl);
+      slot.classList.add('occupied');
+    }
+  });
+}
+
+// Renderiza la mano del jugador
+function renderHand() {
+  const state = getCombatState();
+  if (!state) return;
+
+  const handEl = document.getElementById('player-hand');
+  handEl.innerHTML = '';
+
+  state.player.hand.forEach((card, i) => {
+    const cardEl = createCardElement(card, 'player', true);
+
+    // ¿Se puede jugar?
+    const canPlay = canPlayCard(card, state);
+
+    cardEl.addEventListener('click', () => {
+      if (canPlay) onHandCardClick(i);
+    });
+
+    handEl.appendChild(cardEl);
+  });
+}
+
+// Renderiza los stats del héroe
+function renderHeroStats() {
+  const state = getCombatState();
+  if (!state) return;
+
+  document.getElementById('player-hp').textContent    = `❤ ${state.player.hero.health}`;
+  document.getElementById('player-armor').textContent = `🛡 ${state.player.hero.armor}`;
+  document.getElementById('enemy-hp').textContent     = `❤ ${state.enemy.hero.health}`;
+  document.getElementById('enemy-armor').textContent  = `🛡 ${state.enemy.hero.armor}`;
+  document.getElementById('enemy-name').textContent   = state.enemy.name;
+  document.getElementById('enemy-intent').textContent = `intención: atacar ${state.enemy.intent.value}`;
+  document.getElementById('player-deck-count').textContent  = state.player.deck.length;
+  document.getElementById('enemy-deck-count').textContent   = state.enemy.deck ? state.enemy.deck.length : 0;
+  document.getElementById('player-graveyard-count').textContent = state.player.graveyard.length;
+  document.getElementById('enemy-graveyard-count').textContent  = state.enemy.graveyard.length;
+
+  const gems = state.player.gems;
+  const charges = state.player.magicCharges;
+  document.getElementById('turn-label').textContent =
+    `turno ${state.turn} — gemas ${gems.current}/${gems.max} · cargas ${charges.current}/${charges.max}`;
+}
+
+// Renderiza todo el tablero
+function renderAll() {
+  renderField('player');
+  renderField('enemy');
+  renderHand();
+  renderHeroStats();
+}
+
+// ===========================
+// VERIFICAR SI SE PUEDE JUGAR
+// ===========================
+function canPlayCard(card, state) {
+  if (!state) return false;
+  if (!state.player) return false;
+  if (!state.player.gems) return false;
+  if (state.player.gems.current < card.cost.gems) return false;
+  if (state.player.magicCharges.current < card.cost.charges) return false;
+  if (state.player.hero.health <= card.cost.life) return false;
+  if (card.cost.graveyard > 0 && state.player.graveyard.filter(c => !c.isBanished).length < card.cost.graveyard) return false;
+  if (card.format === 'creature' && state.player.field.length >= 6) return false;
+  return true;
+}
+// ===========================
+// LOG VISUAL
+// ===========================
+function showLog(msg) {
+  const log = document.getElementById('combat-log');
+  log.textContent = msg;
+  clearTimeout(log._timeout);
+  log._timeout = setTimeout(() => { log.textContent = ''; }, 3000);
+}
+
+// ===========================
+// INTERACCIONES (placeholders
+// que combat.js llenará)
+// ===========================
+let selectedCard = null; // carta seleccionada para atacar
+
+function onHandCardClick(index) {
+  const state = getCombatState();
+  if (!state || state.phase !== 'player' || state.isOver) return;
+  const card = state.player.hand[index];
+  showLog(`Jugaste: ${card.name}`);
+  // Por ahora solo muestra el nombre — la lógica real va en combat.js Parte 2
+}
+
+function onFieldCardClick(side, index) {
+  const state = getCombatState();
+  if (!state || state.phase !== 'player' || state.isOver) return;
+  showLog(`Click en carta de ${side} en posición ${index}`);
+  // Lógica de ataque — combat.js Parte 2
+}
+
+function onGraveyardClick(side) {
+  const state = getCombatState();
+  if (!state) return;
+  const gy = side === 'player' ? state.player.graveyard : state.enemy.graveyard;
+  showLog(`Cementerio de ${side}: ${gy.length} cartas`);
+}
+
+function onEndTurn() {
+  const state = getCombatState();
+  if (!state || state.phase !== 'player' || state.isOver) return;
+  showLog('Turno terminado.');
+  // Lógica real — combat.js Parte 2
+}
+
+// ===========================
+// INICIAR COMBATE DE PRUEBA
+// ===========================
+function startTestCombat() {
+  const testDeck = [
+    "slime","aldeano","lobo","arquero","guerrero",
+    "conejo_loco","arbol","vendaje","escudero","golem",
+    "pocion","zarzas","elixir","herrero","daga_basica"
+  ];
+  const testEnemy = {
+    id: "slime_boss",
+    name: "Slime Jefe",
+    health: 30,
+    armor: 0,
+    deck: ["slime","slime","aldeano","lobo"],
+    intent: { type: "attack", value: 6 }
+  };
+  startCombat(testDeck, testEnemy);
+  showScreen('screen-combat');
+  renderAll();
+}
+
+// ===========================
+// INICIALIZACIÓN
+// ===========================
 document.addEventListener('DOMContentLoaded', () => {
   updateGoldDisplay();
+  // Botón temporal de prueba en Taberna
+  document.getElementById('screen-tavern').querySelector('.placeholder-container').innerHTML += `
+    <button class="back-btn" style="margin-top:8px; border-color: var(--gold); color: var(--gold);"
+      onclick="startTestCombat()">⚔️ Probar combate</button>
+  `;
 });

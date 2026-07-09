@@ -5,7 +5,12 @@
   --bg-primary:    #0f0e17;
   --bg-secondary:  #1a1a2e;
   --bg-card:       #16213e;
+  --bg-enemy:      rgba(192, 57, 43, 0.08);
+  --bg-player:     rgba(123, 94, 167, 0.08);
   --border:        #2a2a4a;
+  --border-enemy:  rgba(192, 57, 43, 0.3);
+  --border-player: rgba(123, 94, 167, 0.3);
+  --border-strong: #3a3a5a;
   --text-primary:  #f0e6d3;
   --text-secondary:#a89880;
   --text-muted:    #6b6080;
@@ -14,8 +19,12 @@
   --accent:        #7b5ea7;
   --accent-hover:  #9b7ec7;
   --danger:        #c0392b;
+  --success:       #27ae60;
+  --gem-blue:      #378ADD;
+  --charge-cyan:   #56b4d3;
+  --life-cost:     #7b5ea7;
+  --armor-teal:    #5f9ea0;
   --radius:        10px;
-  --shadow:        0 4px 24px rgba(0,0,0,0.5);
 }
 
 *, *::before, *::after {
@@ -28,8 +37,8 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Segoe UI', system-ui, sans-serif;
-  min-height: 100vh;
-  overflow: hidden;
+  height: 100vh;
+  overflow: visible;
 }
 
 /* ===========================
@@ -40,10 +49,8 @@ body {
   width: 100vw;
   height: 100vh;
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
 }
-
 .screen.active {
   display: flex;
   align-items: center;
@@ -62,41 +69,30 @@ body {
   width: 100%;
   max-width: 480px;
 }
-
 .game-title {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 800;
   letter-spacing: 0.15em;
   color: var(--gold);
-  text-shadow:
-    0 0 20px rgba(212, 168, 67, 0.4),
-    0 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 0 0 20px rgba(212,168,67,0.4), 0 2px 4px rgba(0,0,0,0.8);
 }
-
 .game-subtitle {
   font-size: 0.95rem;
   color: var(--text-secondary);
   letter-spacing: 0.05em;
   margin-top: -1.2rem;
 }
-
-/* ===========================
-   BOTONES DEL MENÚ
-=========================== */
 .menu-nav {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
   width: 100%;
 }
-
 .menu-btn {
   display: grid;
   grid-template-columns: 2.5rem 1fr;
   grid-template-rows: auto auto;
-  grid-template-areas:
-    "icon label"
-    "icon desc";
+  grid-template-areas: "icon label" "icon desc";
   align-items: center;
   gap: 0 0.75rem;
   width: 100%;
@@ -109,44 +105,18 @@ body {
   transition: border-color 0.2s, background 0.2s, transform 0.15s;
   text-align: left;
 }
-
 .menu-btn:hover {
   border-color: var(--gold-dark);
   background: var(--bg-secondary);
   transform: translateX(4px);
 }
-
-.btn-icon {
-  grid-area: icon;
-  font-size: 1.6rem;
-  line-height: 1;
-  justify-self: center;
-}
-
-.btn-label {
-  grid-area: label;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.btn-desc {
-  grid-area: desc;
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-}
+.btn-icon { grid-area: icon; font-size: 1.6rem; justify-self: center; }
+.btn-label { grid-area: label; font-size: 1.05rem; font-weight: 600; }
+.btn-desc  { grid-area: desc;  font-size: 0.78rem; color: var(--text-secondary); }
+.menu-footer { font-size: 0.9rem; color: var(--gold); font-weight: 500; }
 
 /* ===========================
-   FOOTER DEL MENÚ
-=========================== */
-.menu-footer {
-  font-size: 0.9rem;
-  color: var(--gold);
-  font-weight: 500;
-}
-
-/* ===========================
-   PANTALLAS PLACEHOLDER
+   PLACEHOLDERS
 =========================== */
 .placeholder-container {
   display: flex;
@@ -161,17 +131,8 @@ body {
   max-width: 400px;
   width: 90%;
 }
-
-.placeholder-container h2 {
-  font-size: 1.5rem;
-  color: var(--gold);
-}
-
-.placeholder-container p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-}
-
+.placeholder-container h2 { font-size: 1.5rem; color: var(--gold); }
+.placeholder-container p  { color: var(--text-secondary); font-size: 0.95rem; }
 .back-btn {
   margin-top: 0.5rem;
   padding: 0.6rem 1.4rem;
@@ -183,8 +144,277 @@ body {
   font-size: 0.9rem;
   transition: border-color 0.2s, color 0.2s;
 }
+.back-btn:hover { border-color: var(--gold-dark); color: var(--text-primary); }
 
-.back-btn:hover {
-  border-color: var(--gold-dark);
+/* ===========================
+   PANTALLA DE COMBATE
+=========================== */
+#screen-combat {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 12px;
+  gap: 6px;
+  overflow: hidden;
+}
+#screen-combat.active { display: flex; }
+
+.combat-back-btn {
+  position: absolute;
+  top: 8px; left: 8px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  z-index: 100;
+  transition: color 0.2s, border-color 0.2s;
+}
+.combat-back-btn:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+/* ===========================
+   ZONAS DE COMBATE
+=========================== */
+.combat-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===========================
+   FILA DEL HÉROE
+=========================== */
+.hero-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 70px 100px;
+  gap: 6px;
+  align-items: center;
+}
+.enemy-zone .hero-row {
+  grid-template-columns: 70px 1fr 70px;
+}
+
+.hero-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.hero-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.hero-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 1.5px solid var(--border);
+}
+.enemy-avatar { background: var(--bg-enemy); border-color: var(--border-enemy); }
+.player-avatar { background: var(--bg-player); border-color: var(--border-player); }
+
+.hero-stats {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.stat-hp { color: var(--danger); }
+.player-hp { color: var(--success); }
+.stat-armor { color: var(--text-secondary); }
+
+.hero-intent {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-enemy);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* ===========================
+   CEMENTERIO Y MAZO
+=========================== */
+.graveyard, .deck-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.zone-icon { font-size: 18px; }
+.zone-count {
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-primary);
+}
+.zone-label {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+.enemy-deck .zone-count { color: var(--danger); }
+.player-deck .zone-count { color: var(--accent); }
+
+/* ===========================
+   CAMPO DE BATALLA
+=========================== */
+.field {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 8px;
+  min-height: 96px;
+}
+.enemy-field { background: var(--bg-enemy); border: 0.5px solid var(--border-enemy); }
+.player-field { background: var(--bg-player); border: 0.5px solid var(--border-player); }
+
+.field-slot {
+  width: 64px; height: 86px;
+  border-radius: 8px;
+  border: 0.5px dashed var(--border);
+  opacity: 0.3;
+  flex-shrink: 0;
+  position: relative;
+}
+.field-slot.occupied { opacity: 1; border: none; }
+
+/* ===========================
+   SEPARADOR DE TURNO
+=========================== */
+.turn-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.divider-line { flex: 1; height: 0.5px; background: var(--border); }
+.turn-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+/* ===========================
+   BOTÓN TERMINAR TURNO
+=========================== */
+.end-turn-btn {
+  padding: 8px 6px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border-strong);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 11px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.end-turn-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent-hover);
+}
+.end-turn-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   CARTAS EN EL CAMPO
+=========================== */
+.card {
+  position: relative;
+  width: 64px; height: 86px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 0.5px solid var(--border-strong);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, z-index 0s;
+  z-index: 1;
+}
+.card:hover {
+  transform: scale(1.9) translateY(-8px);
+  z-index: 50;
+}
+.player-field .card:hover { transform: scale(1.9) translateY(8px); }
+
+.card-name {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 7px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 4px;
+  pointer-events: none;
+}
+
+/* Recuadros de esquinas */
+.card-badge {
+  position: absolute;
+  border-radius: 3px;
+  width: 15px; height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 600;
+  color: #fff;
+  pointer-events: none;
+}
+.badge-gem     { background: var(--gem-blue);   top: 3px;    left: 3px; }
+.badge-charge  { background: var(--charge-cyan); top: 20px;   left: 3px; }
+.badge-lifecost{ background: var(--life-cost);   top: 20px;   left: 3px; }
+.badge-attack  { background: #555;               bottom: 3px; left: 3px; }
+.badge-weapon  { background: var(--accent);      bottom: 20px;left: 3px; }
+.badge-hp      { background: var(--danger);      bottom: 3px; right: 3px; }
+.badge-armor   { background: var(--armor-teal);  bottom: 20px;right: 3px;}
+
+/* Estados visuales */
+.card.can-attack  { border-color: var(--gold); box-shadow: 0 0 6px rgba(212,168,67,0.4); }
+.card.selected    { border-color: var(--accent); box-shadow: 0 0 8px rgba(123,94,167,0.6); }
+.card.targetable  { border-color: var(--danger); box-shadow: 0 0 6px rgba(192,57,43,0.4); }
+.card.stunned     { opacity: 0.5; }
+
+/* ===========================
+   MANO DEL JUGADOR
+=========================== */
+.hand {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 4px 0 2px;
+  overflow: visible;
+  flex-wrap: nowrap;
+}
+
+/* Cartas en mano: más pequeñas */
+.hand .card {
+  width: 54px; height: 72px;
+}
+.hand .card:hover {
+  transform: scale(2.1) translateY(-36px);
+  z-index: 100;
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(212,168,67,0.4);
+}
+/* ===========================
+   LOG DE COMBATE
+=========================== */
+.combat-log {
+  position: absolute;
+  bottom: 8px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(15,14,23,0.85);
+  padding: 4px 12px;
+  border-radius: 6px;
+  pointer-events: none;
+  max-width: 400px;
+  text-align: center;
+  z-index: 200;
 }

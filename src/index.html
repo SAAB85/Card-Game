@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Card Game</title>
+  <title>Guild of Cards</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- PANTALLA: MENÚ PRINCIPAL -->
+  <!-- ========================
+       PANTALLA: MENÚ PRINCIPAL
+  ========================= -->
   <div id="screen-menu" class="screen active">
     <div class="menu-container">
-      <h1 class="game-title">CARD GAME</h1>
+      <h1 class="game-title">Guild of Cards</h1>
       <p class="game-subtitle">El destino del reino está en tus cartas</p>
       <nav class="menu-nav">
         <button class="menu-btn" onclick="showScreen('screen-exploration')">
@@ -36,7 +38,114 @@
     </div>
   </div>
 
-  <!-- PANTALLA: EXPLORACIÓN (placeholder) -->
+  <!-- ========================
+       PANTALLA: COMBATE
+  ========================= -->
+  <div id="screen-combat" class="screen">
+
+    <!-- ZONA ENEMIGA -->
+    <div class="combat-zone enemy-zone">
+
+      <!-- Fila info enemigo: cementerio | avatar | mazo -->
+      <div class="hero-row">
+        <div class="graveyard" id="enemy-graveyard" onclick="onGraveyardClick('enemy')">
+          <span class="zone-icon">💀</span>
+          <span class="zone-count" id="enemy-graveyard-count">0</span>
+          <span class="zone-label">cementerio</span>
+        </div>
+
+        <div class="hero-info">
+          <div class="hero-name" id="enemy-name">Slime Jefe</div>
+          <div class="hero-avatar enemy-avatar" id="enemy-avatar">👾</div>
+          <div class="hero-stats">
+            <span class="stat-hp" id="enemy-hp">❤ 30</span>
+            <span class="stat-armor" id="enemy-armor">🛡 0</span>
+          </div>
+          <div class="hero-intent" id="enemy-intent">intención: atacar 6</div>
+        </div>
+
+        <div class="deck-pile enemy-deck" id="enemy-deck">
+          <span class="zone-icon">🂠</span>
+          <span class="zone-count" id="enemy-deck-count">24</span>
+          <span class="zone-label">mazo</span>
+        </div>
+      </div>
+
+      <!-- Campo de criaturas enemigas -->
+      <div class="field enemy-field" id="enemy-field">
+        <div class="field-slot" data-side="enemy" data-index="0"></div>
+        <div class="field-slot" data-side="enemy" data-index="1"></div>
+        <div class="field-slot" data-side="enemy" data-index="2"></div>
+        <div class="field-slot" data-side="enemy" data-index="3"></div>
+        <div class="field-slot" data-side="enemy" data-index="4"></div>
+        <div class="field-slot" data-side="enemy" data-index="5"></div>
+      </div>
+    </div>
+
+    <!-- SEPARADOR DE TURNO -->
+    <div class="turn-divider">
+      <div class="divider-line"></div>
+      <span class="turn-label" id="turn-label">turno del jugador — gemas 1/1</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- ZONA DEL JUGADOR -->
+    <div class="combat-zone player-zone">
+
+      <!-- Campo de criaturas del jugador -->
+      <div class="field player-field" id="player-field">
+        <div class="field-slot" data-side="player" data-index="0"></div>
+        <div class="field-slot" data-side="player" data-index="1"></div>
+        <div class="field-slot" data-side="player" data-index="2"></div>
+        <div class="field-slot" data-side="player" data-index="3"></div>
+        <div class="field-slot" data-side="player" data-index="4"></div>
+        <div class="field-slot" data-side="player" data-index="5"></div>
+      </div>
+
+      <!-- Fila info jugador: cementerio | avatar | mazo | botón -->
+      <div class="hero-row">
+        <div class="graveyard" id="player-graveyard" onclick="onGraveyardClick('player')">
+          <span class="zone-icon">💀</span>
+          <span class="zone-count" id="player-graveyard-count">0</span>
+          <span class="zone-label">cementerio</span>
+        </div>
+
+        <div class="hero-info">
+          <div class="hero-stats">
+            <span class="stat-hp player-hp" id="player-hp">❤ 30</span>
+            <span class="stat-armor" id="player-armor">🛡 0</span>
+          </div>
+          <div class="hero-avatar player-avatar" id="player-avatar">🧙</div>
+          <div class="hero-name">Tú</div>
+        </div>
+
+        <div class="deck-pile player-deck" id="player-deck">
+          <span class="zone-icon">🂠</span>
+          <span class="zone-count" id="player-deck-count">0</span>
+          <span class="zone-label">mazo</span>
+        </div>
+
+        <button class="end-turn-btn" id="end-turn-btn" onclick="onEndTurn()">
+          Terminar<br>turno →
+        </button>
+      </div>
+
+      <!-- Mano del jugador -->
+      <div class="hand" id="player-hand"></div>
+
+    </div>
+
+    <!-- LOG DE COMBATE -->
+    <div class="combat-log" id="combat-log"></div>
+
+    <!-- Botón volver (esquina superior izquierda) -->
+    <button class="combat-back-btn" onclick="showScreen('screen-menu')">← Menú</button>
+
+  </div>
+
+  <!-- ========================
+       PANTALLA: EXPLORACIÓN
+  ========================= -->
   <div id="screen-exploration" class="screen">
     <div class="placeholder-container">
       <h2>⚔️ Exploración</h2>
@@ -45,7 +154,9 @@
     </div>
   </div>
 
-  <!-- PANTALLA: TABERNA (placeholder) -->
+  <!-- ========================
+       PANTALLA: TABERNA
+  ========================= -->
   <div id="screen-tavern" class="screen">
     <div class="placeholder-container">
       <h2>🍺 Taberna</h2>
@@ -54,7 +165,9 @@
     </div>
   </div>
 
-  <!-- PANTALLA: TIENDA (placeholder) -->
+  <!-- ========================
+       PANTALLA: TIENDA
+  ========================= -->
   <div id="screen-shop" class="screen">
     <div class="placeholder-container">
       <h2>🏪 Tienda</h2>
@@ -62,7 +175,9 @@
       <button class="back-btn" onclick="showScreen('screen-menu')">← Volver al menú</button>
     </div>
   </div>
+
   <script src="cards.js"></script>
+  <script src="combat.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
