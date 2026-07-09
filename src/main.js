@@ -200,38 +200,134 @@ function showLog(msg) {
 }
 
 // ===========================
-// INTERACCIONES (placeholders
-// que combat.js llenará)
+// SISTEMA DE SELECCIÓN
 // ===========================
-let selectedCard = null; // carta seleccionada para atacar
+let selectedAttacker = null; // instancia seleccionada para atacar
+
+function clearSelection() {
+  selectedAttacker = null;
+  document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.card.targetable').forEach(c => c.classList.remove('targetable'));
+  document.querySelectorAll('.field-slot.targetable').forEach(c => c.classList.remove('targetable'));
+}
 
 function onHandCardClick(index) {
   const state = getCombatState();
   if (!state || state.phase !== 'player' || state.isOver) return;
+
+  clearSelection();
   const card = state.player.hand[index];
-  showLog(`Jugaste: ${card.name}`);
-  // Por ahora solo muestra el nombre — la lógica real va en combat.js Parte 2
+
+  // Criaturas y hechizos sin target: jugar directo
+  if (card.format === 'creature' || (card.format === 'spell' && !needsTarget(card))) {
+    const ok = playCard(index);
+    if (ok) renderAll();
+  }
+  // Hechizos/equipos que necesitan target: marcar targetables
+  else {
+    selectedAttacker = { type: 'hand', index, card };
+    showLog(`Selecciona un objetivo para ${card.name}.`);
+    markTargetables(card);
+    renderAll();
+  }
 }
 
 function onFieldCardClick(side, index) {
   const state = getCombatState();
   if (!state || state.phase !== 'player' || state.isOver) return;
-  showLog(`Click en carta de ${side} en posición ${index}`);
-  // Lógica de ataque — combat.js Parte 2
+
+  const creature = side === 'player'
+    ? state.player.field[index]
+    : state.enemy.field[index];
+
+  if (!creature) return;
+
+  // Si hay un atacante seleccionado → atacar esta criatura
+  if (selectedAttacker && selectedAttacker.type === 'attacker') {
+    const ok = attackWith(selectedAttacker.instanceId, creature.instanceId);
+    clearSelection();
+    if (ok) renderAll();
+    return;
+  }
+
+  // Si hay carta de mano seleccionada que necesita target
+  if (selectedAttacker && selectedAttacker.type === 'hand') {
+    const ok = playCard(selectedAttacker.index, creature.instanceId);
+    clearSelection();
+    if (ok) renderAll();
+    return;
+  }
+
+  // Seleccionar criatura propia para atacar
+  if (side === 'player' && creature.canAttackThisTurn
+    && !creature.statusEffects.find(e => e.type === 'stunned')
+    && !creature.statusEffects.find(e => e.type === 'petrified')) {
+    selectedAttacker = { type: 'attacker', instanceId: creature.instanceId };
+    showLog(`${creature.name} listo para atacar — selecciona un objetivo.`);
+    markAttackTargets();
+    renderAll();
+    // Marcar carta seleccionada visualmente
+    const slots = document.querySelectorAll('#player-field .field-slot');
+    if (slots[index]) {
+      const cardEl = slots[index].querySelector('.card');
+      if (cardEl) cardEl.classList.add('selected');
+    }
+  }
 }
 
-function onGraveyardClick(side) {
+function onHeroClick(side) {
   const state = getCombatState();
-  if (!state) return;
-  const gy = side === 'player' ? state.player.graveyard : state.enemy.graveyard;
-  showLog(`Cementerio de ${side}: ${gy.length} cartas`);
+  if (!state || state.phase !== 'player' || state.isOver) return;
+
+  if (selectedAttacker && selectedAttacker.type === 'attacker' && side === 'enemy') {
+    const ok = attackWith(selectedAttacker.instanceId, 'enemy-hero');
+    clearSelection();
+    if (ok) renderAll();
+  }
 }
 
 function onEndTurn() {
   const state = getCombatState();
   if (!state || state.phase !== 'player' || state.isOver) return;
-  showLog('Turno terminado.');
-  // Lógica real — combat.js Parte 2
+  clearSelection();
+  endPlayerTurn();
+  renderAll();
+  // Esperar turno enemigo y re-renderizar
+  setTimeout(() => renderAll(), 1200);
+}
+
+// ===========================
+// HELPERS DE TARGETING
+// ===========================
+
+function needsTarget(card) {
+  const targetEffects = [
+    'heal2','heal3','applyBurn','damage2Stun','damage7',
+    'petrify','cleanse','destroyArmor','equipArmor1hp1',
+    'equipArmor3','equipArmor5','equipSwordBasic',
+    'equipDaggerBasic','equipKatana'
+  ];
+  return targetEffects.includes(card.effect);
+}
+
+function markTargetables(card) {
+  // Para equipos solo criaturas aliadas
+  // Para hechizos de daño/debuff solo criaturas enemigas
+  // Para hechizos de curación criaturas aliadas
+  const healEffects = ['heal2','heal3','cleanse','equipArmor1hp1','equipArmor3','equipArmor5','equipSwordBasic','equipDaggerBasic','equipKatana'];
+  const side = healEffects.includes(card.effect) ? 'player' : 'enemy';
+  const slots = document.querySelectorAll(`#${side}-field .field-slot.occupied`);
+  slots.forEach(slot => slot.classList.add('targetable'));
+}
+
+function markAttackTargets() {
+  // Marcar héroe enemigo y criaturas enemigas como targetables
+  document.getElementById('enemy-avatar').style.cursor = 'crosshair';
+  const slots = document.querySelectorAll('#enemy-field .field-slot.occupied');
+  slots.forEach(slot => {
+    const card = slot.querySelector('.card');
+    if (card) card.classList.add('targetable');
+  });
 }
 
 // ===========================
