@@ -24,9 +24,13 @@ function updateGoldDisplay() {
 // ===========================
 
 // Crea el HTML de una carta (para campo o mano)
-function createCardElement(instance, side, inHand = false) {
+function createCardElement(instance, side, inHand = false, animate = false) {
   const div = document.createElement('div');
   div.className = 'card';
+  if (animate) {
+    div.classList.add('card-draw');
+    setTimeout(() => div.classList.remove('card-draw'), 400);
+  }
   div.dataset.instanceId = instance.instanceId;
 
   // Nombre
@@ -61,7 +65,6 @@ function createCardElement(instance, side, inHand = false) {
 
   // Badge ataque (solo criaturas)
   if (instance.format === 'creature') {
-    // Daño de arma encima del ataque
     if (instance.equipment) {
       const weaponBadge = document.createElement('div');
       weaponBadge.className = 'card-badge badge-weapon';
@@ -73,7 +76,6 @@ function createCardElement(instance, side, inHand = false) {
     atkBadge.textContent = instance.attack;
     div.appendChild(atkBadge);
 
-    // Armadura encima de vida
     if (instance.armor > 0) {
       const armorBadge = document.createElement('div');
       armorBadge.className = 'card-badge badge-armor';
@@ -81,7 +83,6 @@ function createCardElement(instance, side, inHand = false) {
       div.appendChild(armorBadge);
     }
 
-    // Vida
     const hpBadge = document.createElement('div');
     hpBadge.className = 'card-badge badge-hp';
     hpBadge.textContent = instance.health;
@@ -132,7 +133,8 @@ function renderHand() {
   handEl.innerHTML = '';
 
   state.player.hand.forEach((card, i) => {
-    const cardEl = createCardElement(card, 'player', true);
+    const cardEl = createCardElement(card, 'player', true, card._isNew);
+    card._isNew = false;
 
     // ¿Se puede jugar?
     const canPlay = canPlayCard(card, state);

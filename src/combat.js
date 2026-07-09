@@ -104,6 +104,7 @@ function drawCard() {
   }
 
   const card = player.deck.shift();
+  card._isNew = true;
   player.hand.push(card);
 }
 
