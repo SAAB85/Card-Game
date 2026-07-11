@@ -281,10 +281,20 @@ function onHeroClick(side) {
   const state = getCombatState();
   if (!state || state.phase !== 'player' || state.isOver) return;
 
+  // Atacar héroe enemigo con criatura seleccionada
   if (selectedAttacker && selectedAttacker.type === 'attacker' && side === 'enemy') {
     const ok = attackWith(selectedAttacker.instanceId, 'enemy-hero');
     clearSelection();
     if (ok) renderAll();
+    return;
+  }
+
+  // Curar héroe propio con hechizo seleccionado
+  if (selectedAttacker && selectedAttacker.type === 'hand' && side === 'player') {
+    const ok = playCard(selectedAttacker.index, 'player-hero');
+    clearSelection();
+    if (ok) renderAll();
+    return;
   }
 }
 

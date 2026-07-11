@@ -431,13 +431,23 @@ function applyEffect(effectId, source, targetInstanceId, side) {
       break;
 
     case 'heal2':
-      if (target) { target.health = Math.min(target.health + 2, target.maxHealth); addLog(`💚 ${target.name} recuperó 2 de vida.`); }
-      else { state.player.hero.health = Math.min(state.player.hero.health + 2, state.player.hero.maxHealth); addLog(`💚 Recuperaste 2 de vida.`); }
+      if (target) {
+        target.health = Math.min(target.health + 2, target.maxHealth);
+        addLog(`💚 ${target.name} recuperó 2 de vida.`);
+      } else {
+        state.player.hero.health = Math.min(state.player.hero.health + 2, state.player.hero.maxHealth);
+        addLog(`💚 Recuperaste 2 de vida.`);
+      }
       break;
 
     case 'heal3':
-      if (target) { target.health = Math.min(target.health + 3, target.maxHealth); addLog(`💚 ${target.name} recuperó 3 de vida.`); }
-      else { state.player.hero.health = Math.min(state.player.hero.health + 3, state.player.hero.maxHealth); addLog(`💚 Recuperaste 3 de vida.`); }
+      if (target) {
+        target.health = Math.min(target.health + 3, target.maxHealth);
+        addLog(`💚 ${target.name} recuperó 3 de vida.`);
+      } else {
+        state.player.hero.health = Math.min(state.player.hero.health + 3, state.player.hero.maxHealth);
+        addLog(`💚 Recuperaste 3 de vida.`);
+      }
       break;
 
     case 'applyBurn':
@@ -625,6 +635,8 @@ function checkDeaths() {
 function findCreatureByInstanceId(instanceId, side) {
   const state = combatState;
   if (!instanceId) return null;
+  if (instanceId === 'player-hero') return state.player.hero;
+  if (instanceId === 'enemy-hero') return state.enemy.hero;
   const field = side === 'player' ? state.player.field : state.enemy.field;
   return field.find(c => c.instanceId === instanceId) || null;
 }
