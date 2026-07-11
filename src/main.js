@@ -165,8 +165,9 @@ function renderHeroStats() {
 
   const gems = state.player.gems;
   const charges = state.player.magicCharges;
-  document.getElementById('turn-label').textContent =
-    `turno ${state.turn} — gemas ${gems.current}/${gems.max} · cargas ${charges.current}/${charges.max}`;
+  document.getElementById('turn-label').textContent = `turno ${state.turn}`;
+  document.getElementById('player-gems').textContent = `💎 ${gems.current}/${gems.max}`;
+  document.getElementById('player-charges').textContent = `⚡ ${charges.current}/${charges.max}`;
 }
 
 // Renderiza todo el tablero
