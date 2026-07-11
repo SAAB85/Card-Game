@@ -32,6 +32,7 @@ function createCardElement(instance, side, inHand = false, animate = false) {
     setTimeout(() => div.classList.remove('card-draw'), 400);
   }
   div.dataset.instanceId = instance.instanceId;
+  attachTooltip(div, instance);
 
   // Nombre
   const name = document.createElement('div');
@@ -376,3 +377,57 @@ document.addEventListener('DOMContentLoaded', () => {
       onclick="startTestCombat()">⚔️ Probar combate</button>
   `;
 });
+
+
+// ===========================
+// TOOLTIP DE CARTA
+// ===========================
+
+const tooltip = document.getElementById('card-tooltip');
+
+function showTooltip(instance, x, y) {
+  document.getElementById('tooltip-name').textContent = instance.name;
+  document.getElementById('tooltip-rarity').textContent = instance.rarity;
+  document.getElementById('tooltip-rarity').className = `tooltip-rarity ${instance.rarity}`;
+
+  // Stats según formato
+  let stats = '';
+  if (instance.format === 'creature') {
+    stats = `⚔️ ${instance.attack}  ❤️ ${instance.health}`;
+    if (instance.armor > 0) stats += `  🛡 ${instance.armor}`;
+  } else if (instance.format === 'equipment') {
+    if (instance.durability) stats = `Durabilidad: ${instance.durability}`;
+  }
+
+  // Costo
+  let cost = `💎 ${instance.cost.gems}`;
+  if (instance.cost.charges > 0) cost += `  ⚡ ${instance.cost.charges}`;
+  if (instance.cost.life > 0) cost += `  💔 ${instance.cost.life}`;
+  if (instance.cost.graveyard > 0) cost += `  💀 ${instance.cost.graveyard}`;
+  stats = cost + (stats ? '\n' + stats : '');
+
+  document.getElementById('tooltip-stats').textContent = stats;
+  document.getElementById('tooltip-desc').textContent = instance.description || '';
+
+  // Posición — evitar que se salga de la pantalla
+  const tw = 180, th = 160;
+  let tx = x + 16;
+  let ty = y - 20;
+  if (tx + tw > window.innerWidth) tx = x - tw - 16;
+  if (ty + th > window.innerHeight) ty = window.innerHeight - th - 10;
+
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top  = ty + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+// Agregar tooltip a una carta recién creada
+function attachTooltip(cardEl, instance) {
+  cardEl.addEventListener('mouseenter', e => showTooltip(instance, e.clientX, e.clientY));
+  cardEl.addEventListener('mousemove',  e => showTooltip(instance, e.clientX, e.clientY));
+  cardEl.addEventListener('mouseleave', hideTooltip);
+}

@@ -469,3 +469,48 @@ body {
 .card-draw {
   animation: cardDraw 0.35s ease-out forwards;
 }
+
+/* ===========================
+   TOOLTIP DE CARTA
+=========================== */
+.card-tooltip {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 180px;
+  z-index: 999;
+  pointer-events: none;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+.card-tooltip.visible { display: flex; }
+.tooltip-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.tooltip-stats {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.tooltip-desc {
+  font-size: 11px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  border-top: 0.5px solid var(--border);
+  padding-top: 6px;
+}
+.tooltip-rarity {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tooltip-rarity.common   { color: var(--text-muted); }
+.tooltip-rarity.rare     { color: #4a9eff; }
+.tooltip-rarity.epic     { color: var(--accent); }
+.tooltip-rarity.legendary{ color: var(--gold); }

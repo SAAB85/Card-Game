@@ -15,6 +15,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 0, life: 0, graveyard: 0 },
     attack: 1, health: 1,
     keywords: [],
+    description: "Una criatura viscosa sin habilidades especiales. Perfecta para turno 1.",
     effect: null
   },
   {
@@ -25,6 +26,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 0, life: 0, graveyard: 0 },
     attack: 1, health: 1,
     keywords: [],
+    description: "Un humilde aldeano dispuesto a luchar. Sin efectos especiales.",
     effect: null
   },
   {
@@ -35,6 +37,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 0, life: 2, graveyard: 0 },
     attack: 1, health: 2,
     keywords: [],
+    description: "Cuesta 2 de tu propia vida para invocarlo. Útil en turno 1 si necesitas un bloqueador resistente.",
     effect: null
   },
   {
@@ -45,6 +48,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 0, life: 0, graveyard: 0 },
     attack: 1, health: 3,
     keywords: ["taunt"],
+    description: "Provocar: el enemigo está obligado a atacar a esta unidad antes que a otras o al héroe.",
     effect: null
   },
   {
@@ -55,7 +59,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "addMagicCharge"       // Añade +1 Carga Mágica permanente
+    description: "Añade +1 Carga Mágica permanente. Las Cargas Mágicas se recargan al inicio de cada turno y permiten lanzar hechizos especiales.",
+    effect: "addMagicCharge"
   },
   {
     id: "incendio",
@@ -65,7 +70,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 1, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "applyBurn"            // 1 daño inmediato + estado Incendiado 2 turnos
+    description: "Inflige 1 de daño inmediato al objetivo. Lo deja Incendiado: recibe 1 de daño adicional al final de los próximos 2 turnos.",
+    effect: "applyBurn"
   },
   {
     id: "vendaje",
@@ -75,7 +81,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 1, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "heal2"                // Recupera 2 de salud al objetivo
+    description: "Recupera 2 de salud a una criatura aliada o a tu héroe.",
+    effect: "heal2"
   },
 
   // ─── COSTE 2 ───────────────────────────────────────────
@@ -88,8 +95,9 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    durability: null,              // Armaduras no tienen durabilidad
-    effect: "equipArmor1hp1"       // +1 vida y +1 armadura al objetivo
+    durability: null,
+    description: "Equipa a una criatura aliada: otorga +1 de vida y +1 de Armadura. La armadura absorbe daño antes de la vida.",
+    effect: "equipArmor1hp1"
   },
   {
     id: "espada_basica",
@@ -100,7 +108,8 @@ const CARD_DEFINITIONS = [
     attack: null, health: null,
     keywords: [],
     durability: 2,
-    effect: "equipSwordBasic"      // +1 ataque (o +2 si objetivo sin armadura)
+    description: "Equipa a una criatura: otorga +1 de ataque. Si el objetivo no tiene armadura, otorga +2 en su lugar. Durabilidad: 2 usos.",
+    effect: "equipSwordBasic"
   },
   {
     id: "herrero",
@@ -110,7 +119,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: 1, health: 2,
     keywords: [],
-    effect: "drawEquipment"        // Al entrar: agrega Espada Básica o Armadura Básica a la mano
+    description: "Al entrar al campo, agrega una Espada Básica o una Armadura Básica (al azar) a tu mano.",
+    effect: "drawEquipment"
   },
   {
     id: "necrofago",
@@ -120,6 +130,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 1 },
     attack: 3, health: 2,
     keywords: [],
+    description: "Para invocarlo debes consumir 1 carta de tu cementerio. Esa carta queda desterrada permanentemente.",
     effect: null
   },
   {
@@ -130,6 +141,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: 2, health: 1,
     keywords: ["pierce"],
+    description: "Perforante: su daño ignora por completo la armadura del objetivo y golpea directo a la vida.",
     effect: null
   },
   {
@@ -141,7 +153,8 @@ const CARD_DEFINITIONS = [
     attack: null, health: null,
     keywords: [],
     durability: null,
-    effect: "equipArmor3"          // +3 armadura al objetivo
+    description: "Equipa a una criatura aliada: otorga 3 de Armadura. La armadura absorbe daño antes de la vida.",
+    effect: "equipArmor3"
   },
   {
     id: "daga_basica",
@@ -152,7 +165,8 @@ const CARD_DEFINITIONS = [
     attack: null, health: null,
     keywords: [],
     durability: 2,
-    effect: "equipDaggerBasic"     // +2 daño Perforante al objetivo
+    description: "Equipa a una criatura: otorga +2 de daño Perforante. Su daño ignora la armadura. Durabilidad: 2 usos.",
+    effect: "equipDaggerBasic"
   },
   {
     id: "arbol",
@@ -164,6 +178,7 @@ const CARD_DEFINITIONS = [
     keywords: ["growth"],
     growthTurns: 2,
     growthStats: { attack: 3, health: 3 },
+    description: "Crecimiento: entra con 0/3. Tras 2 turnos en mesa evoluciona a 3/3.",
     effect: null
   },
   {
@@ -174,7 +189,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "damage2Stun"          // 2 daño + Aturdido 1 turno
+    description: "Inflige 2 de daño al objetivo y lo deja Aturdido: pierde la capacidad de atacar durante su próximo turno.",
+    effect: "damage2Stun"
   },
   {
     id: "conejo_loco",
@@ -183,7 +199,8 @@ const CARD_DEFINITIONS = [
     rarity: "common",
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: 2, health: 1,
-    keywords: ["rush"],            // Puede atacar el mismo turno que entra
+    keywords: ["rush"],
+    description: "Rush: puede atacar el mismo turno en que es invocado.",
     effect: null
   },
   {
@@ -194,7 +211,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: 1, health: 1,
     keywords: [],
-    effect: "gainArmorEachTurn"    // Al final de cada turno propio: +1 armadura permanente
+    description: "Al final de cada turno propio, gana +1 de Armadura de forma permanente.",
+    effect: "gainArmorEachTurn"
   },
   {
     id: "elixir",
@@ -204,7 +222,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "chooseAtkOrHp2"       // Elige: +2 ataque O +2 vida al objetivo
+    description: "Elige un objetivo: otorga +2 de ataque O +2 de vida (tú decides al jugarlo).",
+    effect: "chooseAtkOrHp2"
   },
 
   // ─── COSTE 3 ───────────────────────────────────────────
@@ -217,7 +236,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 2, charges: 2, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "slimeDominator"       // Elige: invocar 2 Slimes O dar +2/+2 a un Slime aliado
+    description: "Requiere 2 Cargas Mágicas. Elige: invocar 2 Slimes (1/1) en el campo O dar +2/+2 a un Slime aliado ya en mesa.",
+    effect: "slimeDominator"
   },
   {
     id: "golem",
@@ -227,7 +247,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
     attack: 2, health: 2,
     keywords: [],
-    effect: "enterWith2Armor"      // Entra con 2 de armadura
+    description: "Entra al campo con 2 de Armadura incluidos.",
+    effect: "enterWith2Armor"
   },
   {
     id: "pocion",
@@ -237,7 +258,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "heal3"                // Recupera 3 de vida al objetivo
+    description: "Recupera 3 de vida a una criatura aliada o a tu héroe.",
+    effect: "heal3"
   },
   {
     id: "rosa_mortifera",
@@ -249,7 +271,8 @@ const CARD_DEFINITIONS = [
     keywords: ["growth"],
     growthTurns: 1,
     growthStats: { attack: 3, health: 2 },
-    effect: "bonusDamageNoArmor"   // +2 daño extra a objetivos sin armadura
+    description: "Crecimiento: entra con 0/2. Al siguiente turno evoluciona a 3/2. Inflige +2 de daño extra a objetivos sin armadura.",
+    effect: "bonusDamageNoArmor"
   },
   {
     id: "lobo",
@@ -259,6 +282,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
     attack: 3, health: 2,
     keywords: [],
+    description: "Una bestia feroz. Sin efectos especiales pero con buenas estadísticas para su costo.",
     effect: null
   },
   {
@@ -269,7 +293,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "cleanse"              // Elimina todos los estados negativos del objetivo
+    description: "Elimina todos los estados negativos del objetivo: veneno, aturdimiento, incendio, petrificado y otros.",
+    effect: "cleanse"
   },
   {
     id: "pocima_locura",
@@ -279,7 +304,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "doubleAttack2Turns"   // Objetivo ataca 2 veces por turno durante 2 turnos
+    description: "El objetivo puede atacar 2 veces por turno durante los próximos 2 turnos.",
+    effect: "doubleAttack2Turns"
   },
   {
     id: "rito_nigromante",
@@ -289,7 +315,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "reviveLastCreature"   // Revive la última criatura aliada muerta no consumida
+    description: "Revive la criatura aliada muerta más reciente que no haya sido consumida como combustible. Si no hay ninguna elegible, no se puede jugar.",
+    effect: "reviveLastCreature"
   },
 
   // ─── COSTE 4 ───────────────────────────────────────────
@@ -301,8 +328,9 @@ const CARD_DEFINITIONS = [
     rarity: "epic",
     cost: { gems: 4, charges: 0, life: 0, graveyard: 0 },
     attack: 2, health: 2,
-    keywords: ["dodge"],           // Esquiva el primer golpe por turno rival
-    effect: "bonusDamageNoArmor1"  // +1 daño extra a objetivos sin armadura
+    keywords: ["dodge"],
+    description: "Esquiva el primer golpe recibido por turno rival. Inflige +1 de daño extra a objetivos sin armadura.",
+    effect: "bonusDamageNoArmor1"
   },
   {
     id: "gran_lobo",
@@ -312,6 +340,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 4, charges: 0, life: 0, graveyard: 0 },
     attack: 4, health: 3,
     keywords: [],
+    description: "Una versión mayor y más peligrosa del Lobo. Sin efectos especiales.",
     effect: null
   },
   {
@@ -322,7 +351,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 4, charges: 0, life: 0, graveyard: 0 },
     attack: 1, health: 4,
     keywords: [],
-    effect: "poisonOnAttack"       // Cada ataque envenena al objetivo (2 dmg por 2 turnos)
+    description: "Veneno: cada vez que ataca, envenena al objetivo (2 de daño al final de su turno, dura 2 turnos).",
+    effect: "poisonOnAttack"
   },
   {
     id: "gran_armadura",
@@ -333,7 +363,8 @@ const CARD_DEFINITIONS = [
     attack: null, health: null,
     keywords: [],
     durability: null,
-    effect: "equipArmor5"          // +5 armadura al objetivo
+    description: "Equipa a una criatura aliada: otorga 5 de Armadura.",
+    effect: "equipArmor5"
   },
   {
     id: "katana",
@@ -344,7 +375,8 @@ const CARD_DEFINITIONS = [
     attack: null, health: null,
     keywords: [],
     durability: 2,
-    effect: "equipKatana"          // +3 daño Perforante, durabilidad 2
+    description: "Equipa a una criatura: otorga +3 de daño Perforante que ignora la armadura. Durabilidad: 2 usos.",
+    effect: "equipKatana"
   },
   {
     id: "gran_slime",
@@ -353,7 +385,8 @@ const CARD_DEFINITIONS = [
     rarity: "common",
     cost: { gems: 4, charges: 0, life: 0, graveyard: 0 },
     attack: 3, health: 3,
-    keywords: ["immunePoison"],    // Inmune a Veneno
+    keywords: ["immunePoison"],
+    description: "Inmune a Veneno: no puede ser envenenado por ningún efecto.",
     effect: null
   },
   {
@@ -364,7 +397,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 4, charges: 3, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "damage7"              // 7 de daño al objetivo
+    description: "Requiere 3 Cargas Mágicas. Inflige 7 de daño a un objetivo.",
+    effect: "damage7"
   },
 
   // ─── COSTE 5 ───────────────────────────────────────────
@@ -379,7 +413,8 @@ const CARD_DEFINITIONS = [
     keywords: ["growth"],
     growthTurns: 2,
     growthStats: { attack: 5, health: 5 },
-    effect: "hitRandomEnemyEachTurn" // Al final de cada turno golpea a un enemigo al azar
+    description: "Crecimiento: entra con 0/5. Tras 2 turnos evoluciona a 5/5. Al final de cada turno golpea a un enemigo al azar.",
+    effect: "hitRandomEnemyEachTurn"
   },
   {
     id: "pocion_acida",
@@ -389,7 +424,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 5, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "destroyArmor"         // Destruye toda la armadura del objetivo
+    description: "Destruye toda la armadura del objetivo al instante.",
+    effect: "destroyArmor"
   },
   {
     id: "petrificar",
@@ -399,7 +435,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 5, charges: 0, life: 0, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "petrify"              // Objetivo: ataque pasa a 0, pierde efectos, conserva vida
+    description: "Petrifica al objetivo: su ataque pasa a 0, pierde todos sus efectos y habilidades. Conserva su vida actual.",
+    effect: "petrify"
   },
 
   // ─── COSTE 6 ───────────────────────────────────────────
@@ -412,7 +449,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 6, charges: 0, life: 0, graveyard: 0 },
     attack: 3, health: 2,
     keywords: [],
-    effect: "ninjaEntry"           // Al entrar: ataca. Si mata → Oculto. Si no → Venena (3 dmg x2 turnos)
+    description: "Al entrar: ataca inmediatamente a un enemigo. Si lo mata, entra en Oculto (no puede ser seleccionado). Si no lo mata, lo envenena (3 de daño por 2 turnos).",
+    effect: "ninjaEntry"
   },
   {
     id: "carnicero",
@@ -422,7 +460,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 6, charges: 0, life: 0, graveyard: 0 },
     attack: 3, health: 6,
     keywords: [],
-    effect: "doubleAttackWithWeapon" // Si tiene arma equipada: ataca 2 veces por turno
+    description: "Si tiene un arma equipada, puede atacar 2 veces por turno.",
+    effect: "doubleAttackWithWeapon"
   },
 
   // ─── COSTE 7 ───────────────────────────────────────────
@@ -435,6 +474,7 @@ const CARD_DEFINITIONS = [
     cost: { gems: 7, charges: 0, life: 0, graveyard: 0 },
     attack: 5, health: 5,
     keywords: ["immunePoison", "immuneBurn", "immuneStun"],
+    description: "Inmune a Veneno, Incendio y Aturdimiento. Una bestia imparable.",
     effect: null
   },
 
@@ -448,7 +488,8 @@ const CARD_DEFINITIONS = [
     cost: { gems: 10, charges: 5, life: 5, graveyard: 0 },
     attack: null, health: null,
     keywords: [],
-    effect: "skipEnemyTurn"        // El rival pierde completamente su siguiente turno
+    description: "El rival pierde por completo su siguiente turno — solo puede pasar. Requiere 10 gemas, 5 Cargas Mágicas y 5 de vida propia.",
+    effect: "skipEnemyTurn"
   }
 
 ];
@@ -457,18 +498,16 @@ const CARD_DEFINITIONS = [
 // FUNCIONES DE UTILIDAD
 // ===========================
 
-// Obtiene la definición de una carta por su ID
 function getCard(id) {
   return CARD_DEFINITIONS.find(card => card.id === id) || null;
 }
 
-// Crea una instancia jugable a partir de una definición
 function createInstance(cardId) {
   const def = getCard(cardId);
   if (!def) return null;
 
   return {
-    instanceId: crypto.randomUUID(),  // ID único de esta instancia
+    instanceId: crypto.randomUUID(),
     definitionId: def.id,
     name: def.name,
     format: def.format,
@@ -484,9 +523,10 @@ function createInstance(cardId) {
     turnsInField: 0,
     durability: def.durability || null,
     effect: def.effect,
-    statusEffects: [],              // ["poisoned", "burned", "stunned", "petrified", "stealth"]
-    canAttackThisTurn: false,       // False al invocar (excepto "rush")
-    equipment: null,                // ID de instancia del equipo adjunto
-    isBanished: false               // True si fue consumida como combustible
+    description: def.description || '',
+    statusEffects: [],
+    canAttackThisTurn: false,
+    equipment: null,
+    isBanished: false
   };
 }
