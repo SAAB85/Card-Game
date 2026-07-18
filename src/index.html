@@ -56,13 +56,19 @@
 
         <div class="hero-info">
           <div class="hero-name" id="enemy-name">Slime Jefe</div>
-          <div class="hero-avatar enemy-avatar" id="enemy-avatar" onclick="onHeroClick('enemy')" style="cursor:pointer;">👾</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="hero-avatar enemy-avatar" id="enemy-avatar">👾</div>
+            <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px;">
+              <span id="enemy-gems" style="font-size:15px; font-weight:600; color:#378ADD;">💎 1/1</span>
+              <span id="enemy-charges" style="font-size:13px; font-weight:600; color:#56b4d3;">⚡ 0/0</span>
+            </div>
+          </div>
           <div class="hero-stats">
             <span class="stat-hp" id="enemy-hp">❤ 30</span>
-            <span class="stat-armor" id="enemy-armor">🛡 0</span>
+              <span class="stat-armor" id="enemy-armor">🛡 0</span>
+            </div>
+            <div class="hero-intent" id="enemy-intent">intención: atacar 6</div>
           </div>
-          <div class="hero-intent" id="enemy-intent">intención: atacar 6</div>
-        </div>
 
         <div class="deck-pile enemy-deck" id="enemy-deck">
           <span class="zone-icon">🂠</span>

@@ -81,157 +81,59 @@ function getEnemyAction(combatState) {
 
 function playEnemyCards(combatState) {
   const enemy = combatState.enemy;
-  const player = combatState.player;
 
-  // Ordenar mano por costo (jugar las más baratas primero)
   enemy.hand.sort((a, b) => a.cost.gems - b.cost.gems);
 
-  let played = true;
-  while (played) {
-    played = false;
-    for (let i = 0; i < enemy.hand.length; i++) {
-      const card = enemy.hand[i];
+  // Recolectar cartas que puede jugar
+  const toPlay = [];
+  let gemsCopy = enemy.gems.current;
+  let chargesCopy = enemy.magicCharges.current;
 
-      // Verificar si puede pagarlo
-      if (enemy.gems.current < card.cost.gems) continue;
-      if (enemy.magicCharges.current < card.cost.charges) continue;
+  for (const card of enemy.hand) {
+    if (gemsCopy < card.cost.gems) continue;
+    if (chargesCopy < card.cost.charges) continue;
+    if (card.format === 'creature' && enemy.field.length + toPlay.filter(c => c.format === 'creature').length >= 6) continue;
+    toPlay.push(card);
+    gemsCopy -= card.cost.gems;
+    chargesCopy -= card.cost.charges;
+  }
 
-      // Criaturas: jugar si hay espacio
+  // Jugar cada carta con delay para dar sensación de turno real
+  toPlay.forEach((card, index) => {
+    setTimeout(() => {
+      // Verificar que aún puede jugarse
+      if (enemy.gems.current < card.cost.gems) return;
+      if (enemy.magicCharges.current < card.cost.charges) return;
+
+      enemy.gems.current -= card.cost.gems;
+      enemy.magicCharges.current -= card.cost.charges;
+      enemy.hand = enemy.hand.filter(c => c.instanceId !== card.instanceId);
+
       if (card.format === 'creature' && enemy.field.length < 6) {
-        enemy.gems.current -= card.cost.gems;
         card.canAttackThisTurn = false;
         card.turnsInField = 0;
         enemy.field.push(card);
-        enemy.hand.splice(i, 1);
         addLog(`👾 ${enemy.name} invocó ${card.name}.`);
-
-        // Efectos de entrada del enemigo
         applyEnemyCardEffect(card, combatState);
-        played = true;
-        break;
-      }
-
-      // Hechizos
-      if (card.format === 'spell') {
-        enemy.gems.current -= card.cost.gems;
-        enemy.magicCharges.current -= card.cost.charges;
-        enemy.hand.splice(i, 1);
+      } else if (card.format === 'spell') {
         enemy.graveyard.push(card);
         addLog(`👾 ${enemy.name} lanzó ${card.name}.`);
         applyEnemySpellEffect(card, combatState);
-        played = true;
-        break;
       }
-    }
-  }
+
+      checkDeaths();
+      checkWinCondition();
+
+      // Re-renderizar después de cada carta
+      if (typeof renderAll === 'function') renderAll();
+
+    }, index * 800); // 800ms entre cada carta
+  });
+
+  // Esperar a que terminen todas las cartas antes de atacar
+  return toPlay.length * 800;
 }
 
-// ===========================
-// EFECTOS DE CARTA DEL ENEMIGO
-// ===========================
-
-function applyEnemyCardEffect(card, combatState) {
-  const enemy = combatState.enemy;
-  const player = combatState.player;
-
-  switch(card.effect) {
-    case 'spawnCopyOnEnter':
-      if (enemy.field.length < 6) {
-        const copy = createInstance(card.definitionId);
-        copy.canAttackThisTurn = false;
-        enemy.field.push(copy);
-        addLog(`👾 ${card.name} invocó una copia de sí mismo.`);
-      }
-      break;
-
-    case 'buffPerSlimeOnEnter': {
-      const slimeCount = enemy.field.filter(c =>
-        c.name.toLowerCase().includes('slime') ||
-        c.definitionId.includes('slime')
-      ).length;
-      card.attack += slimeCount;
-      card.health += slimeCount;
-      card.maxHealth += slimeCount;
-      if (slimeCount > 0) addLog(`👾 ${card.name} ganó +${slimeCount}/+${slimeCount}.`);
-      break;
-    }
-
-    case 'drawOnEnterAndDeath':
-      if (enemy.deck.length > 0 && enemy.hand.length < 10) {
-        const drawn = enemy.deck.shift();
-        enemy.hand.push(drawn);
-        addLog(`👾 ${enemy.name} robó una carta.`);
-      }
-      break;
-
-    case 'spawnSlimeAlfa': {
-      const alfa = createInstance('slime_alfa');
-      alfa.canAttackThisTurn = false;
-      if (enemy.field.length < 6) {
-        enemy.field.push(alfa);
-        addLog(`👾 ${enemy.name} invocó al Slime Alfa.`);
-      }
-      break;
-    }
-  }
-}
-
-function applyEnemySpellEffect(card, combatState) {
-  const enemy = combatState.enemy;
-  const player = combatState.player;
-
-  switch(card.effect) {
-    case 'buffAllSlimes':
-      enemy.field.forEach(c => {
-        if (c.definitionId.includes('slime') || c.name.toLowerCase().includes('slime')) {
-          c.attack += 1;
-          c.health += 1;
-          c.maxHealth += 1;
-        }
-      });
-      addLog(`👾 Todos los Slimes del enemigo ganaron +1/+1.`);
-      break;
-
-    case 'buffAllAllies':
-      enemy.field.forEach(c => {
-        c.attack += 1;
-        c.health += 1;
-        c.maxHealth += 1;
-      });
-      addLog(`👾 Todas las criaturas enemigas ganaron +1/+1.`);
-      break;
-
-    case 'spawnThreeSlimes':
-      for (let i = 0; i < 3 && enemy.field.length < 6; i++) {
-        const s = createInstance('slime');
-        s.canAttackThisTurn = false;
-        enemy.field.push(s);
-      }
-      addLog(`👾 ${enemy.name} invocó 3 Slimes.`);
-      break;
-
-    case 'heal2':
-      enemy.hero.health = Math.min(enemy.hero.health + 2, enemy.hero.maxHealth);
-      addLog(`👾 ${enemy.name} recuperó 2 de vida.`);
-      break;
-
-    case 'controlUntilEndOfTurn': {
-      // Tomar control de la criatura más fuerte del jugador
-      if (player.field.length > 0) {
-        const strongest = player.field.reduce((a, b) => a.attack > b.attack ? a : b);
-        strongest._controlled = true;
-        strongest.canAttackThisTurn = true;
-        // Atacar con ella al héroe del jugador
-        const dmg = Math.max(0, strongest.attack - player.hero.armor);
-        player.hero.armor = Math.max(0, player.hero.armor - strongest.attack);
-        player.hero.health -= dmg;
-        addLog(`👾 ${enemy.name} controló a ${strongest.name} y atacó por ${dmg}.`);
-        strongest._controlled = false;
-      }
-      break;
-    }
-  }
-}
 
 // ===========================
 // ATACAR CON CRIATURAS ENEMIGAS
@@ -295,7 +197,6 @@ function attackWithEnemyCreatures(combatState) {
 // TURNO COMPLETO DEL ENEMIGO
 // (reemplaza la función en combat.js)
 // ===========================
-
 function enemyTurnFull(combatState) {
   if (!combatState || combatState.isOver) return;
 
@@ -307,29 +208,36 @@ function enemyTurnFull(combatState) {
   // Habilitar ataque de criaturas enemigas
   combatState.enemy.field.forEach(c => { c.canAttackThisTurn = true; });
 
-  // Ejecutar IA
-  getEnemyAction(combatState);
+  // Ejecutar IA y obtener delay total de animaciones
+  const delay = getEnemyAction(combatState) || 0;
 
-  checkWinCondition();
-  if (combatState.isOver) return;
+  // Esperar a que terminen todas las animaciones de cartas
+  setTimeout(() => {
+    checkWinCondition();
+    if (combatState.isOver) {
+      if (typeof renderAll === 'function') renderAll();
+      if (typeof showResult === 'function') showResult(combatState.winner);
+      return;
+    }
 
-  // Procesar estados
-  combatState.enemy.field.forEach(c => processStatusEffects(c));
-  combatState.player.field.forEach(c => processStatusEffects(c));
-  processStatusEffects(combatState.player.hero);
-  checkDeaths();
-  checkWinCondition();
+    // Procesar estados
+    combatState.enemy.field.forEach(c => processStatusEffects(c));
+    combatState.player.field.forEach(c => processStatusEffects(c));
+    processStatusEffects(combatState.player.hero);
+    checkDeaths();
+    checkWinCondition();
 
-  // Iniciar siguiente turno del jugador
-  combatState.turn++;
-  combatState.phase = 'player';
-  if (combatState.player.gems.max < 10) combatState.player.gems.max++;
-  combatState.player.gems.current = combatState.player.gems.max;
-  combatState.player.magicCharges.current = combatState.player.magicCharges.max;
-  combatState.player.field.forEach(c => { c.canAttackThisTurn = true; });
-  drawCard();
+    // Iniciar siguiente turno del jugador
+    combatState.turn++;
+    combatState.phase = 'player';
+    if (combatState.player.gems.max < 10) combatState.player.gems.max++;
+    combatState.player.gems.current = combatState.player.gems.max;
+    combatState.player.magicCharges.current = combatState.player.magicCharges.max;
+    combatState.player.field.forEach(c => { c.canAttackThisTurn = true; });
+    drawCard();
+    combatState.enemy.intent = { type: "invocando", value: 0 };
+    addLog(`— Turno ${combatState.turn} —`);
 
-  // Nueva intención del enemigo
-  combatState.enemy.intent = { type: "summon", value: 0 };
-  addLog(`— Turno ${combatState.turn} —`);
+    if (typeof renderAll === 'function') renderAll();
+  }, delay + 1000);
 }

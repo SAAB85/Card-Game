@@ -107,7 +107,7 @@ function renderField(side) {
     slot.classList.remove('occupied');
 
     if (creatures[i]) {
-      const cardEl = createCardElement(creatures[i], side, false);
+      const cardEl = createCardElement(creatures[i], side, side === 'enemy' ? true : false);
 
       // Clases de estado
       if (side === 'player' && creatures[i].canAttackThisTurn) {
@@ -157,8 +157,10 @@ function renderHeroStats() {
   document.getElementById('player-armor').textContent = `🛡 ${state.player.hero.armor}`;
   document.getElementById('enemy-hp').textContent     = `❤ ${state.enemy.hero.health}`;
   document.getElementById('enemy-armor').textContent  = `🛡 ${state.enemy.hero.armor}`;
-  document.getElementById('enemy-name').textContent   = state.enemy.name;
-  document.getElementById('enemy-intent').textContent = `intención: atacar ${state.enemy.intent.value}`;
+  document.getElementById('enemy-name').textContent    = state.enemy.name;
+  document.getElementById('enemy-intent').textContent  = `intención: ${state.enemy.intent.type}`;
+  document.getElementById('enemy-gems').textContent    = `💎 ${state.enemy.gems.current}/${state.enemy.gems.max}`;
+  document.getElementById('enemy-charges').textContent = `⚡ ${state.enemy.magicCharges.current}/${state.enemy.magicCharges.max}`;
   document.getElementById('player-deck-count').textContent  = state.player.deck.length;
   document.getElementById('enemy-deck-count').textContent   = state.enemy.deck ? state.enemy.deck.length : 0;
   document.getElementById('player-graveyard-count').textContent = state.player.graveyard.length;
