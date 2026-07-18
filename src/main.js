@@ -307,7 +307,11 @@ function onEndTurn() {
   endPlayerTurn();
   renderAll();
   // Esperar turno enemigo y re-renderizar
-  setTimeout(() => renderAll(), 1200);
+  setTimeout(() => {
+    renderAll();
+    const state = getCombatState();
+    if (state && state.isOver) showResult(state.winner);
+  }, 1200);
 }
 
 // ===========================
@@ -430,4 +434,59 @@ function attachTooltip(cardEl, instance) {
   cardEl.addEventListener('mouseenter', e => showTooltip(instance, e.clientX, e.clientY));
   cardEl.addEventListener('mousemove',  e => showTooltip(instance, e.clientX, e.clientY));
   cardEl.addEventListener('mouseleave', hideTooltip);
+}
+
+// ===========================
+// ESCALA ADAPTATIVA
+// ===========================
+function adjustScale() {
+  const baseWidth  = 1280;
+  const baseHeight = 900;
+  const scaleX = window.innerWidth  / baseWidth;
+  const scaleY = window.innerHeight / baseHeight;
+  const scale  = Math.min(scaleX, scaleY, 1);
+  const combat = document.getElementById('screen-combat');
+  combat.style.transform = `scale(${scale})`;
+  combat.style.transformOrigin = 'top left';
+  combat.style.width  = (100 / scale) + 'vw';
+  combat.style.height = (100 / scale) + 'vh';
+  combat.style.zoom   = '';
+}
+
+window.addEventListener('resize', adjustScale);
+adjustScale();
+
+
+// ===========================
+// PANTALLA FIN DE COMBATE
+// ===========================
+
+function showResult(winner) {
+  const screen = document.getElementById('screen-result');
+  const icon   = document.getElementById('result-icon');
+  const title  = document.getElementById('result-title');
+  const msg    = document.getElementById('result-msg');
+
+  if (winner === 'player') {
+    icon.textContent  = '🏆';
+    title.textContent = '¡Victoria!';
+    msg.textContent   = 'Derrotaste a tu enemigo. ¡El reino está a salvo!';
+    title.style.color = '#d4a843';
+  } else {
+    icon.textContent  = '💀';
+    title.textContent = 'Derrota';
+    msg.textContent   = 'Has caído en batalla. Reagrúpate e inténtalo de nuevo.';
+    title.style.color = '#c0392b';
+  }
+
+  screen.style.display = 'flex';
+}
+
+function hideResult() {
+  document.getElementById('screen-result').style.display = 'none';
+}
+
+function retryCombt() {
+  hideResult();
+  startTestCombat();
 }

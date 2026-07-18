@@ -182,6 +182,17 @@
     </div>
   </div>
 
+  <!-- PANTALLA FIN DE COMBATE -->
+  <div id="screen-result" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:500; flex-direction:column; align-items:center; justify-content:center; gap:20px;">
+    <div id="result-icon" style="font-size:72px;"></div>
+    <div id="result-title" style="font-size:36px; font-weight:800; color:#f0e6d3; letter-spacing:0.1em;"></div>
+    <div id="result-msg" style="font-size:16px; color:#a89880;"></div>
+    <div style="display:flex; gap:12px; margin-top:10px;">
+      <button onclick="hideResult(); showScreen('screen-menu')" style="padding:10px 24px; border-radius:8px; border:1px solid #3a3a5a; background:#1a1a2e; color:#f0e6d3; font-size:14px; cursor:pointer;">← Menú principal</button>
+      <button onclick="retryCombt()" style="padding:10px 24px; border-radius:8px; border:1px solid #d4a843; background:transparent; color:#d4a843; font-size:14px; cursor:pointer;">↺ Reintentar</button>
+    </div>
+  </div>
+
   <!-- TOOLTIP DE CARTA -->
   <div class="card-tooltip" id="card-tooltip">
     <div class="tooltip-rarity" id="tooltip-rarity"></div>
