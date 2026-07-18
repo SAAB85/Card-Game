@@ -357,14 +357,7 @@ function startTestCombat() {
     "conejo_loco","arbol","vendaje","escudero","golem",
     "pocion","zarzas","elixir","herrero","daga_basica"
   ];
-  const testEnemy = {
-    id: "slime_boss",
-    name: "Slime Jefe",
-    health: 30,
-    armor: 0,
-    deck: ["slime","slime","aldeano","lobo"],
-    intent: { type: "attack", value: 6 }
-  };
+  const testEnemy = getEnemy("slime_rey");
   startCombat(testDeck, testEnemy);
   showScreen('screen-combat');
   renderAll();

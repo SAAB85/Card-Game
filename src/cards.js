@@ -490,6 +490,133 @@ const CARD_DEFINITIONS = [
     keywords: [],
     description: "El rival pierde por completo su siguiente turno — solo puede pasar. Requiere 10 gemas, 5 Cargas Mágicas y 5 de vida propia.",
     effect: "skipEnemyTurn"
+  },
+
+  // ─── CARTAS DE SLIME (genéricas) ───────────────────────
+
+  {
+    id: "slime_venenoso",
+    name: "Slime Venenoso",
+    format: "creature",
+    rarity: "common",
+    cost: { gems: 2, charges: 0, life: 0, graveyard: 0 },
+    attack: 1, health: 2,
+    keywords: [],
+    description: "Veneno: cada vez que ataca, envenena al objetivo (2 de daño al final de su turno, dura 2 turnos).",
+    effect: "poisonOnAttack"
+  },
+  {
+    id: "slime_explosivo",
+    name: "Slime Explosivo",
+    format: "creature",
+    rarity: "common",
+    cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
+    attack: 2, health: 1,
+    keywords: [],
+    description: "Al morir, inflige 2 de daño a todas las criaturas enemigas en campo.",
+    effect: "explodeOnDeath"
+  },
+  {
+    id: "slime_duplicado",
+    name: "Slime Duplicado",
+    format: "creature",
+    rarity: "common",
+    cost: { gems: 4, charges: 0, life: 0, graveyard: 0 },
+    attack: 2, health: 2,
+    keywords: [],
+    description: "Al entrar al campo, invoca una copia de sí mismo (2/2) si hay espacio.",
+    effect: "spawnCopyOnEnter"
+  },
+  {
+    id: "slime_amigo",
+    name: "Slime Amigo",
+    format: "creature",
+    rarity: "common",
+    cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
+    attack: 1, health: 1,
+    keywords: [],
+    description: "Al entrar al campo, gana +1/+1 por cada Slime aliado en mesa (incluyéndose a sí mismo).",
+    effect: "buffPerSlimeOnEnter"
+  },
+  {
+    id: "slime_anciano",
+    name: "Slime Anciano",
+    format: "creature",
+    rarity: "rare",
+    cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
+    attack: 1, health: 2,
+    keywords: [],
+    description: "Al entrar al campo, roba 1 carta. Al morir, roba 1 carta.",
+    effect: "drawOnEnterAndDeath"
+  },
+
+  // ─── CARTAS ÚNICAS DEL SLIME REY ───────────────────────
+
+  {
+    id: "mimetismo",
+    name: "Mimetismo",
+    format: "spell",
+    rarity: "legendary",
+    cost: { gems: 7, charges: 0, life: 0, graveyard: 0 },
+    attack: null, health: null,
+    keywords: [],
+    description: "Invoca un Slime Alfa (3/3). Al final de cada turno, el Slime Alfa absorbe a 1 Slime aliado sumando su ataque y vida.",
+    effect: "spawnSlimeAlfa"
+  },
+  {
+    id: "slime_alfa",
+    name: "Slime Alfa",
+    format: "creature",
+    rarity: "legendary",
+    cost: { gems: 0, charges: 0, life: 0, graveyard: 0 },
+    attack: 3, health: 3,
+    keywords: [],
+    description: "Al final de cada turno, absorbe a 1 Slime aliado sumando su ataque y vida a los suyos. Esa criatura muere.",
+    effect: "absorbSlimeEachTurn"
+  },
+  {
+    id: "marea_slimes",
+    name: "Marea de Slimes",
+    format: "spell",
+    rarity: "rare",
+    cost: { gems: 5, charges: 0, life: 0, graveyard: 0 },
+    attack: null, health: null,
+    keywords: [],
+    description: "Invoca 3 Slimes (1/1) en el campo si hay espacio disponible.",
+    effect: "spawnThreeSlimes"
+  },
+  {
+    id: "reproduccion",
+    name: "Reproducción",
+    format: "spell",
+    rarity: "rare",
+    cost: { gems: 4, charges: 0, life: 0, graveyard: 0 },
+    attack: null, health: null,
+    keywords: [],
+    description: "Otorga +1/+1 a todos los Slimes aliados en campo.",
+    effect: "buffAllSlimes"
+  },
+  {
+    id: "triunfo",
+    name: "Triunfo",
+    format: "spell",
+    rarity: "rare",
+    cost: { gems: 3, charges: 0, life: 0, graveyard: 0 },
+    attack: null, health: null,
+    keywords: [],
+    description: "Otorga +1/+1 a todas las criaturas aliadas en campo.",
+    effect: "buffAllAllies"
+  },
+  {
+    id: "absorber",
+    name: "Absorber",
+    format: "spell",
+    rarity: "epic",
+    cost: { gems: 6, charges: 0, life: 0, graveyard: 0 },
+    attack: null, health: null,
+    keywords: [],
+    description: "Toma control de una criatura enemiga hasta el fin de tu turno. Al terminar el turno regresa al campo enemigo.",
+    effect: "controlUntilEndOfTurn"
   }
 
 ];

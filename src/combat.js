@@ -53,16 +53,26 @@ function startCombat(playerDeckIds, enemy) {
   const enemyState = {
     id: enemy.id,
     name: enemy.name,
+    avatar: enemy.avatar || '👾',
     hero: {
       health: enemy.health,
       maxHealth: enemy.health,
       armor: enemy.armor || 0
     },
+    gems: {
+      current: 1,
+      max: 1
+    },
+    magicCharges: {
+      current: 0,
+      max: 0
+    },
+    specialMechanic: enemy.specialMechanic || null,
     field: [],
     graveyard: [],
     deck: (enemy.deck || []).map(id => createInstance(id)).filter(Boolean),
     hand: [],
-    intent: { ...enemy.intent }   // Lo que hará el próximo turno
+    intent: { ...enemy.intent }
   };
 
   // Estado global del combate
@@ -379,40 +389,7 @@ function endPlayerTurn() {
 // ───────────────────────────────────────────
 
 function enemyTurn() {
-  const state = combatState;
-  if (!state || state.isOver) return;
-
-  addLog(`👾 Turno del enemigo.`);
-
-  // El enemigo ataca directamente al héroe del jugador
-  const dmg = state.enemy.intent.value;
-  applyDamage(state.player.hero, dmg);
-  addLog(`👾 ${state.enemy.name} atacó por ${dmg} de daño.`);
-
-  checkWinCondition();
-  if (state.isOver) return;
-
-  // Inicio del siguiente turno del jugador
-  state.turn++;
-  state.phase = 'player';
-
-  // Subir gemas
-  if (state.player.gems.max < 10) state.player.gems.max++;
-  state.player.gems.current = state.player.gems.max;
-
-  // Recargar cargas mágicas
-  state.player.magicCharges.current = state.player.magicCharges.max;
-
-  // Habilitar ataque de todas las criaturas
-  state.player.field.forEach(c => { c.canAttackThisTurn = true; });
-
-  // Robar carta
-  drawCard();
-
-  // Nueva intención del enemigo
-  state.enemy.intent.value = 4 + Math.floor(Math.random() * 6);
-
-  addLog(`— Turno ${state.turn} —`);
+  enemyTurnFull(combatState);
 }
 
 // ───────────────────────────────────────────
